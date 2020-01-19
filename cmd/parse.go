@@ -16,8 +16,7 @@ import (
 )
 
 var stdin []byte
-var sraFields []*extract.SraFields
-var pubMedFields []*extract.PubmedFields
+var keyWords []string
 
 func parseStdin(cmd *cobra.Command) []string {
 	cleanArgs := []string{}
@@ -34,6 +33,11 @@ func parseStdin(cmd *cobra.Command) []string {
 }
 
 func simpleExtr(cmd *cobra.Command, args []string) {
+	if strings.Contains(RootClis.Keywords, " ,") {
+		keyWords = strings.Split(RootClis.Keywords, " ,")
+	} else {
+		keyWords = strings.Split(RootClis.Keywords, ",")
+	}
 	cleanArgs := parseStdin(cmd)
 	var wg sync.WaitGroup
 	sem := make(chan struct{}, RootClis.Thread)
@@ -42,9 +46,9 @@ func simpleExtr(cmd *cobra.Command, args []string) {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			sem <- struct{}{}        // 获取信号
-			defer func() { <-sem }() // 释放信号
-			parseJSON(stdin)
+			sem <- struct{}{}
+			defer func() { <-sem }()
+			defer fmt.Println(string(parseJSON(stdin)))
 		}()
 		RootClis.HelpFlags = false
 	}
@@ -53,7 +57,8 @@ func simpleExtr(cmd *cobra.Command, args []string) {
 			wg.Add(1)
 			go func(v string) {
 				defer wg.Done()
-				sem <- struct{}{} // 获取信号
+				sem <- struct{}{}
+				defer func() { <-sem }()
 				var input []byte
 				var con *os.File
 				var err error
@@ -65,8 +70,7 @@ func simpleExtr(cmd *cobra.Command, args []string) {
 					log.Warnln(err)
 					return
 				}
-				parseJSON(input)
-				defer func() { <-sem }() // 释放信号
+				defer fmt.Println(string(parseJSON(input)))
 			}(v)
 		}
 		RootClis.HelpFlags = false
@@ -74,32 +78,34 @@ func simpleExtr(cmd *cobra.Command, args []string) {
 	wg.Wait()
 }
 
-func parseJSON(dat []byte) {
-	var pubmedJson []parse.PubmedArticleJSON
-	var sraJson []parse.ExperimentPkgJSON
-	keyWords := []string{}
-	if strings.Contains(RootClis.Keywords, " ,") {
-		keyWords = strings.Split(RootClis.Keywords, " ,")
-	} else {
-		keyWords = strings.Split(RootClis.Keywords, ",")
-	}
+func parseJSON(dat []byte) []byte {
+	var sraFields []*extract.SraFields
+	var pubMedFields []*extract.PubmedFields
+	var lock sync.Mutex
+	var pubmedJSON []parse.PubmedArticleJSON
+	var sraJSON []parse.ExperimentPkgJSON
 	if RootClis.Mode == "pubmed" && len(dat) > 0 {
-		json.Unmarshal(stdin, &pubmedJson)
-		for _, v := range pubmedJson {
+		json.Unmarshal(dat, &pubmedJSON)
+		for _, v := range pubmedJSON {
+			lock.Lock()
 			pubMedFields = append(pubMedFields, extract.GetSimplePubmedFields(&keyWords, &v, RootClis.CallCor))
+			lock.Unlock()
 		}
 		dat, _ := json.MarshalIndent(pubMedFields, "", "    ")
-		fmt.Println(string(dat))
+		return dat
 	} else if RootClis.Mode == "sra" && len(dat) > 0 {
-		json.Unmarshal(stdin, &sraJson)
+		json.Unmarshal(dat, &sraJSON)
 		done := make(map[string]int)
-		for _, v := range sraJson {
+		for _, v := range sraJSON {
+			lock.Lock()
 			sraFields = append(sraFields, extract.GetSimpleSraFields(&keyWords, &v, RootClis.CallCor, done))
 			done[v.EXPERIMENT.TITLE+v.STUDY.DESCRIPTOR.STUDYTITLE] = 1
+			lock.Unlock()
 		}
 		dat, _ := json.MarshalIndent(sraFields, "", "    ")
-		fmt.Println(string(dat))
+		return dat
 	}
+	return []byte{}
 }
 
 func init() {

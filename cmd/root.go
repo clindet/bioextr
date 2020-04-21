@@ -38,7 +38,7 @@ var RootClis = RootClisT{
 var RootCmd = &cobra.Command{
 	Use:   "bioextr [filename]",
 	Short: "A simple command line tool to extract information from text and json files.",
-	Long:  `A simple command line tool to extract information from text and json files. More see here https://github.com/openbiox/bioextr.`,
+	Long:  `A simple command line tool to extract information from text and json files. More see here https://github.com/openanno/bioextr.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if RootClis.Clean {
 			initCmd(cmd, args)

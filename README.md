@@ -1,27 +1,27 @@
-<img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" alt="Life cycle: experimental"> <a href="https://godoc.org/github.com/openbiox/bioextr"><img src="https://godoc.org/github.com/openbiox/bioextr?status.svg" alt="GoDoc"></a>
+<img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" alt="Life cycle: experimental"> <a href="https://godoc.org/github.com/openanno/bioextr"><img src="https://godoc.org/github.com/openanno/bioextr?status.svg" alt="GoDoc"></a>
 
 ## bioextr
 
-[bioextr](https://github.com/openbiox/bioextr) is a simple command line tool to extract information from text or json files.
+[bioextr](https://github.com/openanno/bioextr) is a simple command line tool to extract information from text or json files.
 
 ## Installation
 
 ```bash
 # windows
-wget https://github.com/openbiox/bioextr/releases/download/v0.1.0/bioextr.exe
+wget https://github.com/openanno/bioextr/releases/download/v0.1.0/bioextr.exe
 
 # osx
-wget https://github.com/openbiox/bioextr/releases/download/v0.1.0/bioextr_osx
+wget https://github.com/openanno/bioextr/releases/download/v0.1.0/bioextr_osx
 mv bioextr_osx bioextr
 chmod a+x bioextr
 
 # linux
-wget https://github.com/openbiox/bioextr/releases/download/v0.1.0/bioextr_linux64
+wget https://github.com/openanno/bioextr/releases/download/v0.1.0/bioextr_linux64
 mv bioextr_linux64 bioextr
 chmod a+x bioextr
 
 # get latest version
-go get -u github.com/openbiox/bioextr
+go get -u github.com/openanno/bioextr
 ```
 
 ## Usage

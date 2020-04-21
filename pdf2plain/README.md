@@ -13,20 +13,20 @@ Xpdf command line tools (required):
 
 ```bash
 # windows
-wget https://github.com/openbiox/bioextr/releases/download/v0.1.0/pdf2plain.exe
+wget https://github.com/openanno/bioextr/releases/download/v0.1.0/pdf2plain.exe
 
 # osx
-wget https://github.com/openbiox/bioextr/releases/download/v0.1.0/pdf2plain_osx
+wget https://github.com/openanno/bioextr/releases/download/v0.1.0/pdf2plain_osx
 mv pdf2plain_osx pdf2plain
 chmod a+x pdf2plain
 
 # linux
-wget https://github.com/openbiox/bioextr/releases/download/v0.1.0/pdf2plain_linux64
+wget https://github.com/openanno/bioextr/releases/download/v0.1.0/pdf2plain_linux64
 mv pdf2plain_linux64 pdf2plain
 chmod a+x pdf2plain
 
 # get latest version
-go get -u github.com/openbiox/bioextr/pdf2plain
+go get -u github.com/openanno/bioextr/pdf2plain
 ```
 
 ## Usage

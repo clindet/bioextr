@@ -15,7 +15,7 @@
 package main
 
 import (
-	"github.com/openbiox/bioextr/cmd"
+	"github.com/openanno/bioextr/cmd"
 )
 
 func main() {

@@ -32,7 +32,7 @@ var RootClis = RootClisT{
 var RootCmd = &cobra.Command{
 	Use:   "pdf2plain [input.pdf]",
 	Short: "A wrapper command line tool to convert pdf files to plain text.",
-	Long:  `A wrapper command line tool to convert pdf files to plain text. More see here https://github.com/openbiox/bioextr.`,
+	Long:  `A wrapper command line tool to convert pdf files to plain text. More see here https://github.com/openanno/bioextr.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if RootClis.Clean {
 			RootClis.HelpFlags = false

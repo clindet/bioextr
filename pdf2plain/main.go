@@ -15,7 +15,7 @@
 package main
 
 import (
-    "github.com/openbiox/bioextr/pdf2plain/cmd"
+    "github.com/openanno/bioextr/pdf2plain/cmd"
 )
 
 func main() {

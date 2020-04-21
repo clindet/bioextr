@@ -1,4 +1,4 @@
-module github.com/openbiox/bioextr/pdf2plain
+module github.com/openanno/bioextr/pdf2plain
 
 go 1.14
 

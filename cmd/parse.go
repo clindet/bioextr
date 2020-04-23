@@ -48,7 +48,7 @@ func simpleExtr(cmd *cobra.Command, args []string) {
 			defer wg.Done()
 			sem <- struct{}{}
 			defer func() { <-sem }()
-			defer fmt.Println(string(parseJSON(stdin)))
+			defer fmt.Println(string(*parseJSON(stdin)))
 		}()
 		RootClis.HelpFlags = false
 	}
@@ -70,7 +70,7 @@ func simpleExtr(cmd *cobra.Command, args []string) {
 					log.Warnln(err)
 					return
 				}
-				defer fmt.Println(string(parseJSON(input)))
+				defer fmt.Println(string(*parseJSON(input)))
 			}(v)
 		}
 		RootClis.HelpFlags = false
@@ -78,7 +78,7 @@ func simpleExtr(cmd *cobra.Command, args []string) {
 	wg.Wait()
 }
 
-func parseJSON(dat []byte) []byte {
+func parseJSON(dat []byte) *[]byte {
 	var sraFields []*extract.SraFields
 	var pubMedFields []*extract.PubmedFields
 	var lock sync.Mutex
@@ -92,7 +92,7 @@ func parseJSON(dat []byte) []byte {
 			lock.Unlock()
 		}
 		dat, _ := json.MarshalIndent(pubMedFields, "", "    ")
-		return dat
+		return &dat
 	} else if RootClis.Mode == "sra" && len(dat) > 0 {
 		json.Unmarshal(dat, &sraJSON)
 		done := make(map[string]int)
@@ -103,13 +103,17 @@ func parseJSON(dat []byte) []byte {
 			lock.Unlock()
 		}
 		dat, _ := json.MarshalIndent(sraFields, "", "    ")
-		return dat
+		return &dat
+	} else if len(dat) > 0 {
+		obj, _ := extract.GetPlainFields("", &dat, &keyWords, RootClis.CallCor)
+		dat, _ := json.MarshalIndent(obj, "", "    ")
+		return &dat
 	}
-	return []byte{}
+	return nil
 }
 
 func init() {
 	RootCmd.Flags().StringVarP(&RootClis.Keywords, "keywords", "w", "algorithm, tool, model, pipleline, method, database, workflow, dataset, bioinformatics, sequencing, http, github.com, gitlab.com, bitbucket.org", "Keywords to extracted from abstract.")
 	RootCmd.Flags().BoolVarP(&RootClis.CallCor, "call-cor", "", false, "Wheather to calculate the corelated keywords, and return the sentence contains >=2 keywords.")
-	RootCmd.Flags().StringVarP(&RootClis.Mode, "mode", "", "", "mode to extract information (pubmed, sra).")
+	RootCmd.Flags().StringVarP(&RootClis.Mode, "mode", "", "", "mode to extract information: plain,pubmed, or sra.")
 }

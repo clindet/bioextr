@@ -20,8 +20,9 @@ type RootClisT struct {
 	Thread  int
 
 	// call corelation
-	Keywords string
-	CallCor  bool
+	Keywords     string
+	KeywordsFile string
+	CallCor      bool
 
 	// type
 	Mode string

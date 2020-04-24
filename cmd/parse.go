@@ -11,16 +11,15 @@ import (
 
 	"github.com/openbiox/ligo/extract"
 	"github.com/openbiox/ligo/flag"
-	"github.com/openbiox/ligo/parse"
 	"github.com/openbiox/ligo/stringo"
 	"github.com/spf13/cobra"
 )
 
 var stdin []byte
 var keyWords []string
+var cleanArgs []string
 
-func parseStdin(cmd *cobra.Command) []string {
-	cleanArgs := []string{}
+func parseStdin(cmd *cobra.Command) {
 	var err error
 	hasStdin := false
 	if cleanArgs, hasStdin = flag.CheckStdInFlag(cmd); hasStdin {
@@ -30,7 +29,6 @@ func parseStdin(cmd *cobra.Command) []string {
 			log.Fatal(err)
 		}
 	}
-	return cleanArgs
 }
 
 func simpleExtr(cmd *cobra.Command, args []string) {
@@ -44,7 +42,8 @@ func simpleExtr(cmd *cobra.Command, args []string) {
 		keyWordsArr, _ := ioutil.ReadAll(of)
 		keyWords = stringo.StrSplit(string(keyWordsArr), "\r\n|\n|\r|\t", 10000000)
 	}
-	cleanArgs := parseStdin(cmd)
+	keyWords = removeDuplicatesAndEmpty(keyWords)
+	parseStdin(cmd)
 	var wg sync.WaitGroup
 	sem := make(chan struct{}, RootClis.Thread)
 
@@ -85,35 +84,24 @@ func simpleExtr(cmd *cobra.Command, args []string) {
 }
 
 func parseJSON(dat []byte) *[]byte {
-	var sraFields []*extract.SraFields
-	var pubMedFields []*extract.PubmedFields
-	var lock sync.Mutex
-	var pubmedJSON []parse.PubmedArticleJSON
-	var sraJSON []parse.ExperimentPkgJSON
+	var sraFields []extract.SraFields
+	var pubMedFields []extract.PubmedFields
+	var keyWordsPat string
 	if RootClis.Mode == "pubmed" && len(dat) > 0 {
-		json.Unmarshal(dat, &pubmedJSON)
-		for _, v := range pubmedJSON {
-			lock.Lock()
-			pubMedFields = append(pubMedFields, extract.GetSimplePubmedFields(&keyWords, &v, RootClis.CallCor))
-			lock.Unlock()
-		}
-		dat, _ := json.MarshalIndent(pubMedFields, "", "    ")
-		return &dat
+		keyWordsPat = strings.Join(keyWords, "|")
+		pubMedFields, _ = extract.GetSimplePubmedFields("", &dat, &keyWordsPat, RootClis.CallCor, RootClis.Thread)
+		dat2, _ := json.MarshalIndent(pubMedFields, "", "    ")
+		return &dat2
 	} else if RootClis.Mode == "sra" && len(dat) > 0 {
-		json.Unmarshal(dat, &sraJSON)
-		done := make(map[string]int)
-		for _, v := range sraJSON {
-			lock.Lock()
-			sraFields = append(sraFields, extract.GetSimpleSraFields(&keyWords, &v, RootClis.CallCor, done))
-			done[v.EXPERIMENT.TITLE+v.STUDY.DESCRIPTOR.STUDYTITLE] = 1
-			lock.Unlock()
-		}
-		dat, _ := json.MarshalIndent(sraFields, "", "    ")
-		return &dat
+		keyWordsPat = strings.Join(keyWords, "|")
+		sraFields, _ = extract.GetSimpleSraFields("", &dat, &keyWordsPat, RootClis.CallCor, RootClis.Thread)
+		dat2, _ := json.MarshalIndent(sraFields, "", "    ")
+		return &dat2
 	} else if len(dat) > 0 {
-		obj, _ := extract.GetPlainFields("", &dat, &keyWords, RootClis.CallCor)
-		dat, _ := json.MarshalIndent(obj, "", "    ")
-		return &dat
+		keyWordsPat = strings.Join(keyWords, "|")
+		obj, _ := extract.GetPlainFields("", &dat, &keyWordsPat, RootClis.CallCor, RootClis.Thread)
+		dat2, _ := json.MarshalIndent(obj, "", "    ")
+		return &dat2
 	}
 	return nil
 }

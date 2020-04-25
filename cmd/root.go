@@ -25,8 +25,8 @@ type RootClisT struct {
 	CallCor      bool
 
 	// type
-	Mode string
-
+	Mode      string
+	ListFile  string
 	HelpFlags bool
 }
 

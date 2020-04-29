@@ -24,6 +24,9 @@ type RootClisT struct {
 	KeywordsFile string
 	CallCor      bool
 
+	CallURLs bool
+	KeepAbs  bool
+
 	// type
 	Mode      string
 	ListFile  string

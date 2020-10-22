@@ -8,17 +8,13 @@
 
 ```bash
 # windows
-wget https://github.com/openanno/bioextr/releases/download/v0.1.0/bioextr.exe
+wget https://github.com/openanno/bioextr/releases/download/v0.1.0/bioextr_0.1.0_Windows_64-bit.tar.gz
 
 # osx
-wget https://github.com/openanno/bioextr/releases/download/v0.1.0/bioextr_osx
-mv bioextr_osx bioextr
-chmod a+x bioextr
+wget https://github.com/openanno/bioextr/releases/download/v0.1.0/bioextr_0.1.0_Darwin_64-bit.tar.gz
 
 # linux
-wget https://github.com/openanno/bioextr/releases/download/v0.1.0/bioextr_linux64
-mv bioextr_linux64 bioextr
-chmod a+x bioextr
+wget https://github.com/openanno/bioextr/releases/download/v0.1.0/bioextr_0.1.0_Linux_64-bit.tar.gz
 
 # get latest version
 go get -u github.com/openanno/bioextr

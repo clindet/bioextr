@@ -15,7 +15,7 @@
 package main
 
 import (
-	"github.com/openanno/bioextr/cmd"
+	"github.com/clindet/bioextr/cmd"
 )
 
 func main() {
